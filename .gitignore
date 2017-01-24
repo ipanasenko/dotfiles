@@ -1,0 +1,16 @@
+.DS_STORE
+*.log
+.idea
+node_modules
+dist
+coverage
+src/shared/fontello/css/animation.css
+src/shared/fontello/css/fontello.css
+src/shared/fontello/css/fontello-embedded.css
+src/shared/fontello/css/fontello-ie7.css
+src/shared/fontello/css/fontello-ie7-codes.css
+src/shared/fontello/README.txt
+*.private
+!*.private.demo
+*.private.*
+!*.private.demo.*
