@@ -23,6 +23,8 @@
 	st = status --short --branch
 	sy = st
 	pyll = pull
+	pysh = push
+	pish = push
 	lg0 =  "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
         lg = !"git lg1"
         lg1 = !"git lg1-specific --all"
@@ -45,3 +47,5 @@
 	template = /Users/ilyap/.stCommitMsg
 [push]
 	default = simple
+[rebase]
+	autoStash = true

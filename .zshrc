@@ -98,3 +98,6 @@ source '/Users/ilyap/google-cloud-sdk/path.zsh.inc'
 # The next line enables shell command completion for gcloud.
 source '/Users/ilyap/google-cloud-sdk/completion.zsh.inc'
 export PATH="/usr/local/bin:$PATH"
+
+
+eval $(thefuck --alias)
