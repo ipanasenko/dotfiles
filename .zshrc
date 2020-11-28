@@ -5,7 +5,7 @@ export ZSH=/Users/ilyap/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="robbyrussell"
+ZSH_THEME="dracula-pro"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -83,17 +83,33 @@ source $ZSH/oh-my-zsh.sh
 alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+alias yy='yarn && yarn'
 alias ys='yarn && yarn start'
+alias ysn='(se && yarn && yarn start:nocheck)'
+alias yys='yy && yarn start'
 alias yb='yarn && yarn build'
-alias yul='yarn && yarn upgrade-interactive --latest'
+alias ybl='yarn && yarn build:local'
+alias yul='yarn && yarn upgrade-interactive --latest && npx @wix/wix-wnp-version --fix && yarn'
 alias yc='yarn changelog'
+alias yt='yarn && yarn test'
+alias ybt='yarn && yb && yt'
 
-alias g6='cd ~/Projects/media-manager-g6'
-alias g5='cd ~/Projects/media-gallery-g5'
-alias mmgrsdk='cd ~/Projects/media/media-manager-sdk'
-alias wsr='cd ~/Projects/wix-style-react'
-alias media='cd ~/Projects/media'
+alias g6='cd ~/Projects/media-manager-g6 && nvm use'
+alias g5='cd ~/Projects/media-gallery-g5 && nvm use'
+alias mmgrsdk='cd ~/Projects/media/media-manager-sdk && nvm use'
+alias wsr='cd ~/Projects/wix-style-react && nvm use'
+alias media='cd ~/Projects/media && nvm use'
 alias Projects='cd ~/Projects'
+
+alias ap='cd ~/Projects/add-panel && nvm use'
+alias aps='cd ~/Projects/add-panel/add-panel-service && nvm use'
+alias apc='cd ~/Projects/add-panel/add-panel-component && nvm use'
+alias apco='cd ~/Projects/add-panel/add-panel-common && nvm use'
+
+alias se='cd ~/Projects/santa-editor-parent/santa-editor && nvm use'
+alias sep='cd ~/Projects/santa-editor-parent && nvm use'
+alias sepu='cd ~/Projects/SantaEditorPresetsUploader && nvm use'
+alias sit='cd ~/Projects/santa-integration-tests && nvm use'
 
 alias git=hub 
 alias gut=git
@@ -102,11 +118,21 @@ alias gti=git
 alias got=git
 alias gt=git
 alias gpr='git pull --rebase && rm-merged'
+alias gct='git commit -am"wip" --no-verify'
 
 alias rm-merged='git fetch -p && git branch --merged | grep -v "\*" | grep -v master | grep -v develop | grep -v release | xargs -n 1 git branch -d'
 alias sync='git fetch -p && git fetch origin master:master'
-alias sync-rebase='sync && git rebase master && rm-merged'
+alias sync-rebase='sync && git rebase master --autosquash && rm-merged'
+alias sync-rebase-interactive='sync && git rebase master -i --autosquash && rm-merged'
+alias sync-merge='sync && git merge master && rm-merged'
 alias master='sync-rebase && git co master && rm-merged'
+alias sr='sync-rebase'
+alias sri='sync-rebase-interactive'
+alias sm='sync-merge'
+
+alias link-add-panel='yarn link @wix/add-panel-component && (cd santa-editor && yarn link @wix/add-panel-component) && yarn'
+alias unlink-add-panel='yarn unlink @wix/add-panel-component && (cd santa-editor && yarn unlink @wix/add-panel-component) && yarn --force'
+
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
@@ -126,3 +152,8 @@ if [ -f '/Users/ilyap/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/ilyap/goo
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/ilyap/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/ilyap/google-cloud-sdk/completion.zsh.inc'; fi
+
+
+alias vlc='/Applications/VLC.app/Contents/MacOS/VLC'
+
+nvm install
