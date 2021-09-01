@@ -93,12 +93,16 @@ alias yul='yarn && yarn upgrade-interactive --latest && npx @wix/wix-wnp-version
 alias yc='yarn changelog'
 alias yt='yarn && yarn test'
 alias ybt='yarn && yb && yt'
+alias yl='yarn && yarn lint'
+alias ylf='yarn && yarn lint:fix'
+alias ydd='npx yarn-deduplicate yarn.lock && yarn'
 
 alias g6='cd ~/Projects/media-manager-g6'
 alias g5='cd ~/Projects/media-gallery-g5'
 alias mmgrsdk='cd ~/Projects/media/media-manager-sdk'
 alias media='cd ~/Projects/media'
 alias Projects='cd ~/Projects'
+alias P='Projects'
 
 alias wsr='cd ~/Projects/wix-style-react'
 
@@ -121,19 +125,23 @@ alias giy=git
 alias gti=git
 alias got=git
 alias gt=git
-alias gpr='git pull --rebase && rm-merged'
+alias gpr='git pull --rebase && rm-gone'
 alias gct='git commit -am"wip" --no-verify'
 
 alias rm-merged='git fetch -p && git branch --merged | grep -v "\*" | grep -v master | grep -v develop | grep -v release | xargs -n 1 git branch -d'
 alias rm-squashed='git fetch -p && git branch -vv | cut -c 3- | grep '"'"': gone]'"'"' | awk '"'"'{print $1}'"'"' | xargs -n1 -r git branch -D'
+alias rm-gone='rm-merged && rm-squashed'
 alias sync='git fetch -p && git fetch origin master:master'
-alias sync-rebase='sync && git rebase master --autosquash && rm-merged'
-alias sync-rebase-interactive='sync && git rebase master -i --autosquash && rm-merged'
-alias sync-merge='sync && git merge master && rm-merged'
-alias master='sync-rebase && git co master && rm-merged'
+alias sync-rebase-no-rm='sync && git rebase master --autosquash'
+alias sync-rebase='sync-rebase-no-rm && rm-gone'
+alias sync-rebase-interactive='sync && git rebase master -i --autosquash && rm-gone'
+alias sync-merge='sync && git merge master -m"merge master" && rm-gone'
+alias master='sync && git co master && rm-gone'
 alias sr='sync-rebase'
 alias sri='sync-rebase-interactive'
 alias sm='sync-merge'
+
+alias weap='webstorm-eap .'
 
 alias link-add-panel='yarn link @wix/add-panel-component && (cd santa-editor && yarn link @wix/add-panel-component) && yarn'
 alias unlink-add-panel='yarn unlink @wix/add-panel-component && (cd santa-editor && yarn unlink @wix/add-panel-component) && yarn --force'
