@@ -19,9 +19,9 @@
 	pyll = pull
 	pysh = push
 	pish = push
-	lg0 =  "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
-
-	lg = !"git lg1-specific --all"
+	lg =  "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --decorate-refs-exclude='tags/RC;*'"
+	lga = "lg --all"
+	lg0 = !"git lg1-specific --all"
 	lg1 = !"git lg1-specific"
 	lg2 = !"git lg2-specific --all"
 	lg3 = !"git lg3-specific --all"
@@ -42,7 +42,7 @@
 [commit]
 	template = /Users/ilyap/.stCommitMsg
 [push]
-	default = simple
+	default = current
 [rebase]
 	autoStash = true
 [pull]
