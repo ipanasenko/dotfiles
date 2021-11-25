@@ -12,7 +12,7 @@
 	insteadOf = git://github
 [alias]
 	oldest-ancestor = !zsh -c 'diff --old-line-format= --new-line-format= <(git rev-list --first-parent \"${1:-master}\") <(git rev-list --first-parent \"${2:-HEAD}\") | head -1' -
-	pr = pull-request
+	pr = !"gcomp"
 	co = checkout
 	st = status --short --branch
 	sy = st
@@ -42,7 +42,7 @@
 [commit]
 	template = /Users/ilyap/.stCommitMsg
 [push]
-	default = current
+	default = simple
 [rebase]
 	autoStash = true
 [pull]

@@ -129,12 +129,12 @@ alias got=git
 alias gt=git
 alias gpr='git pull --rebase && rm-gone'
 alias gct='git commit -am"wip" --no-verify'
-alias gprq='git push && git compare'
+alias gcomp='(){ BRANCH="$(git rev-parse --abbrev-ref HEAD)"; git push origin -u $BRANCH; git compare }'
 
 alias rm-merged='git fetch -p && git branch --merged | grep -v "\*" | grep -v master | grep -v develop | grep -v release | xargs -n 1 git branch -d'
 alias rm-squashed='git fetch -p && git branch -vv | cut -c 3- | grep '"'"': gone]'"'"' | awk '"'"'{print $1}'"'"' | xargs -n1 -r git branch -D'
 alias rm-gone='rm-merged && rm-squashed'
-alias sync='git fetch -p && git fetch origin master:master && rm-gone'
+alias sync='sync-no-rm && rm-gone'
 alias sync-no-rm='git fetch -p && git fetch origin master:master'
 alias sync-rebase-no-rm='sync-no-rm && git rebase master --autosquash'
 alias sync-rebase='sync-rebase-no-rm && rm-gone'
@@ -144,6 +144,8 @@ alias master='sync-no-rm && git co master && rm-gone'
 alias sr='sync-rebase'
 alias sri='sync-rebase-interactive'
 alias sm='sync-merge'
+alias branch-master='(){ [[ $(git rev-parse --abbrev-ref HEAD) == "master" ]] && (gpr) || (sync); git co -b $1 master }'
+alias bm='branch-master'
 
 alias weap='webstorm-eap .'
 
