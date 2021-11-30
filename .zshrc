@@ -127,9 +127,10 @@ alias giy=git
 alias gti=git
 alias got=git
 alias gt=git
-alias gpr='git pull --rebase && rm-gone'
+alias gpr-no-rm='git pull --rebase'
+alias gpr='gpr-no-rm && rm-gone'
 alias gct='git commit -am"wip" --no-verify'
-alias gcomp='(){ BRANCH="$(git rev-parse --abbrev-ref HEAD)"; git push origin -u $BRANCH; git compare }'
+alias gcomp='(){ BRANCH="$(git rev-parse --abbrev-ref HEAD)"; URL="$(git config --get remote.origin.url)"; git push origin -u $BRANCH; open "$URL/pull/new/$BRANCH" }'
 
 alias rm-merged='git fetch -p && git branch --merged | grep -v "\*" | grep -v master | grep -v develop | grep -v release | xargs -n 1 git branch -d'
 alias rm-squashed='git fetch -p && git branch -vv | cut -c 3- | grep '"'"': gone]'"'"' | awk '"'"'{print $1}'"'"' | xargs -n1 -r git branch -D'
@@ -144,10 +145,11 @@ alias master='sync-no-rm && git co master && rm-gone'
 alias sr='sync-rebase'
 alias sri='sync-rebase-interactive'
 alias sm='sync-merge'
-alias branch-master='(){ [[ $(git rev-parse --abbrev-ref HEAD) == "master" ]] && (gpr) || (sync); git co -b $1 master }'
+alias branch-master='(){ [[ $(git rev-parse --abbrev-ref HEAD) == "master" ]] && (gpr-no-rm) || (sync-no-rm); git co -b $1 master; rm-gone; }'
 alias bm='branch-master'
 
 alias weap='webstorm-eap .'
+alias f='fork .'
 
 alias link-add-panel='yarn link @wix/add-panel-component && (cd santa-editor && yarn link @wix/add-panel-component) && yarn'
 alias unlink-add-panel='yarn unlink @wix/add-panel-component && (cd santa-editor && yarn unlink @wix/add-panel-component) && yarn --force'
