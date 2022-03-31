@@ -19,8 +19,9 @@
 	pyll = pull
 	pysh = push
 	pish = push
-	lg =  "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --decorate-refs-exclude='tags/RC;*'"
-	lga = "lg --all"
+	lgold = "log --color --graph --pretty=format:'%C(bold red)%h%Creset -%C(bold cyan)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --decorate-refs-exclude='tags/RC;'"
+        lg = "lg1"
+        lga = "lg --all"
 	lg0 = !"git lg1-specific --all"
 	lg1 = !"git lg1-specific"
 	lg2 = !"git lg2-specific --all"
