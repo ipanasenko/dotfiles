@@ -40,10 +40,12 @@
 	clean = git lfs clean %f
 	smudge = git lfs smudge %f
 	required = true
+	process = git-lfs filter-process
 [commit]
 	template = /Users/ilyap/.stCommitMsg
 [push]
 	default = simple
+	autoSetupRemote = true
 [rebase]
 	autoStash = true
 [pull]
