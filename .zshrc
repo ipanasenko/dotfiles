@@ -84,9 +84,8 @@ alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 alias yy='yarn && yarn'
-alias ys='yarn && yarn start'
-alias ysn='(se && yarn && yarn start:nocheck)'
-alias yys='yy && yarn start'
+alias ys='yarn && BROWSER=none yarn start'
+alias ysn='(se && yarn && BROWSER=none yarn start:nocheck)'
 alias yb='yarn && yarn build'
 alias ybl='yarn && yarn build:local'
 alias yu='yarn && yarn upgrade-interactive'
@@ -97,6 +96,8 @@ alias ybt='yarn && yb && yt'
 alias yl='yarn && yarn lint'
 alias ylf='yarn && yarn lint:fix'
 alias ydd='npx yarn-deduplicate yarn.lock && yarn'
+alias yd='yarn dedupe'
+alias yyd='yarn && yarn dedupe'
 
 alias nlsit='npm link @wix/santa-integration-tests'
 
@@ -120,11 +121,18 @@ alias sep='cd ~/Projects/santa-editor-parent'
 alias sepu='cd ~/Projects/SantaEditorPresetsUploader'
 alias sit='cd ~/Projects/santa-integration-tests'
 
+alias bcco='cd ~/Projects/bookings-calendar-catalog-owner'
+alias bccv='cd ~/Projects/bookings-calendar-catalog-viewer'
+alias bsfp='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-service-form-page'
+alias bpp='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-pricing-plans'
+alias bsm='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-staff-management'
+alias bsl='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-services-list'
+
 alias sss='P && spot-spotter-server'
 
 alias dm='cd ~/Projects/document-management'
 
-alias git=hub 
+alias git=hub
 alias gut=git
 alias giy=git
 alias gti=git
@@ -151,12 +159,11 @@ alias sri='(){ sync-rebase-interactive $1 }'
 alias sm='(){ sync-merge $1 }'
 alias smgp='(){ sm $1 && gp }'
 alias srgpf='(){ sr $1 && gpf }'
+alias srgcomp='sr && gcomp'
 
 alias weap='webstorm-eap .'
 alias f='fork .'
 
-alias link-add-panel='yarn link @wix/add-panel-component && (cd santa-editor && yarn link @wix/add-panel-component) && yarn'
-alias unlink-add-panel='yarn unlink @wix/add-panel-component && (cd santa-editor && yarn unlink @wix/add-panel-component) && yarn --force'
 
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
@@ -194,3 +201,4 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
+export PATH="/usr/local/bin:$PATH"
