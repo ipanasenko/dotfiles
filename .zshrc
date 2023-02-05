@@ -84,20 +84,23 @@ alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 alias yy='yarn && yarn'
-alias ys='yarn && BROWSER=none yarn start'
-alias ysn='(se && yarn && BROWSER=none yarn start:nocheck)'
-alias yb='yarn && yarn build'
+alias ys='BROWSER=none yarn start'
+alias yys='yarn && ys'
+alias yb='yarn build'
+alias yyb='yarn && yb'
 alias ybl='yarn && yarn build:local'
-alias yu='yarn && yarn upgrade-interactive'
-alias yul='yarn && yarn upgrade-interactive --latest'
 alias yc='yarn changelog'
 alias yt='yarn && yarn test'
 alias ybt='yarn && yb && yt'
 alias yl='yarn && yarn lint'
 alias ylf='yarn && yarn lint:fix'
 alias ydd='npx yarn-deduplicate yarn.lock && yarn'
+alias ym='yarn --mode=update-lockfile'
 alias yd='yarn dedupe'
+alias ydm='yarn dedupe --mode=update-lockfile'
 alias yyd='yarn && yarn dedupe'
+alias yydm='yarn --mode=update-lockfile && yarn dedupe --mode=update-lockfile'
+alias ystrrfc='(){ yarn sled-test-runner remote -f $1 --flakiness-check=20 }'
 
 alias nlsit='npm link @wix/santa-integration-tests'
 
@@ -125,8 +128,12 @@ alias bcco='cd ~/Projects/bookings-calendar-catalog-owner'
 alias bccv='cd ~/Projects/bookings-calendar-catalog-viewer'
 alias bsfp='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-service-form-page'
 alias bpp='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-pricing-plans'
+alias bppa='cd ~/Projects/bookings-calendar-catalog-owner/packages/modules/bookings-pricing-plans-api'
 alias bsm='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-staff-management'
 alias bsl='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-services-list'
+alias bss='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-services-statics'
+alias bicp='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-integration-channels-page'
+alias bacs='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-anywhere-channels-statics'
 
 alias sss='P && spot-spotter-server'
 
@@ -161,8 +168,14 @@ alias smgp='(){ sm $1 && gp }'
 alias srgpf='(){ sr $1 && gpf }'
 alias srgcomp='sr && gcomp'
 
-alias weap='webstorm-eap .'
+alias weap='(){ [[ $1 ]] && (webstorm-eap $1) || (webstorm-eap .) }'
+alias ws='(){ [[ $1 ]] && (webstorm $1) || (webstorm .) }'
 alias f='fork .'
+alias tower='gittower .'
+
+alias npmv='(){ npm v $1 version }'
+
+alias c='cd .'
 
 
 
@@ -202,3 +215,15 @@ add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
 export PATH="/usr/local/bin:$PATH"
+
+source /Users/ilyap/.config/broot/launcher/bash/br
+
+export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+export PUPPETEER_EXECUTABLE_PATH=`which chromium`
+
+# bun completions
+[ -s "/Users/ilyap/.bun/_bun" ] && source "/Users/ilyap/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
