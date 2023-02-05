@@ -2,8 +2,8 @@
 	excludesfile = /Users/ilyap/.gitignore_global
 	editor = vi
 [user]
-	name = Ilya Panasenko
-	email = hottdogg2008@gmail.com
+	name = Illia Panasenko
+	email = ilyap@wix.com
 [filter "hawser"]
 	clean = git hawser clean %f
 	smudge = git hawser smudge %f
@@ -50,3 +50,9 @@
 	autoStash = true
 [pull]
 	rebase = true
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
