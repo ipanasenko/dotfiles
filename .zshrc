@@ -124,16 +124,22 @@ alias sep='cd ~/Projects/santa-editor-parent'
 alias sepu='cd ~/Projects/SantaEditorPresetsUploader'
 alias sit='cd ~/Projects/santa-integration-tests'
 
-alias bcco='cd ~/Projects/bookings-calendar-catalog-owner'
 alias bccv='cd ~/Projects/bookings-calendar-catalog-viewer'
+
+alias bcco='cd ~/Projects/bookings-calendar-catalog-owner'
+alias bam='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-availability-management'
 alias bsfp='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-service-form-page'
 alias bpp='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-pricing-plans'
-alias bppa='cd ~/Projects/bookings-calendar-catalog-owner/packages/modules/bookings-pricing-plans-api'
+alias bnsbm='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-namespaces-bm'
 alias bsm='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-staff-management'
 alias bsl='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-services-list'
 alias bss='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-services-statics'
 alias bicp='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-integration-channels-page'
 alias bacs='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-anywhere-channels-statics'
+alias bccboc='cd ~/Projects/bookings-calendar-catalog-owner/packages/modules/bookings-cc-bo-common'
+alias bppa='cd ~/Projects/bookings-calendar-catalog-owner/packages/modules/bookings-pricing-plans-api'
+alias bnsbma='cd ~/Projects/bookings-calendar-catalog-owner/packages/modules/bookings-namespaces-api'
+alias bsu='cd ~/Projects/bookings-calendar-catalog-owner/packages/modules/bookings-sled-utils'
 
 alias sss='P && spot-spotter-server'
 
@@ -227,3 +233,35 @@ export PUPPETEER_EXECUTABLE_PATH=`which chromium`
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+
+tmutil_exclude() {
+    # todo: recurse to parent dirs to support commands that execute in project subdirs
+    DIR=$1
+    DEP_FILE=$2
+
+    if [ -d "$DIR" ] && [ -f "$DEP_FILE" ] && ! tmutil isexcluded "$DIR" | grep -q '\[Excluded\]'; then
+        tmutil addexclusion "$DIR"
+        echo "tmutil: ${DIR} has been excluded from Time Machine backups"
+    fi
+}
+
+__npm_wrapper () {
+    command npm "$@"
+    EXIT_CODE=$?
+    tmutil_exclude "node_modules" "package.json"
+    tmutil_exclude "dist" "package.json"
+    tmutil_exclude "target" "package.json"
+    return $EXIT_CODE
+}
+__yarn_wrapper () {
+    command yarn "$@"
+    EXIT_CODE=$?
+    tmutil_exclude "node_modules" "package.json"
+    tmutil_exclude "dist" "package.json"
+    tmutil_exclude "target" "package.json"
+    return $EXIT_CODE
+}
+
+alias npm=__npm_wrapper
+alias yarn=__yarn_wrapper
