@@ -20,8 +20,8 @@
 	pysh = push
 	pish = push
 	lgold = "log --color --graph --pretty=format:'%C(bold red)%h%Creset -%C(bold cyan)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --decorate-refs-exclude='tags/RC;'"
-        lg = "lg1"
-        lga = "lg --all"
+    lg = "lg1"
+    lga = "lg --all"
 	lg0 = !"git lg1-specific --all"
 	lg1 = !"git lg1-specific"
 	lg2 = !"git lg2-specific --all"
@@ -31,6 +31,9 @@
 	lg2-specific = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'
 	lg3-specific = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(auto)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> %C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset)'
 	prune-branches = !git remote prune origin && git branch -vv | grep ': gone]' | awk '{print $1}' | ifne xargs git branch -d
+
+	disable-hooks = config core.hooksPath /dev/null
+	enable-hooks = config --unset core.hooksPath
 [color "diff-highlight"]
 	oldNormal = red bold
 	oldHighlight = red bold 52
@@ -52,7 +55,7 @@
 	rebase = true
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
+	path =
 [mergetool "sourcetree"]
 	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
