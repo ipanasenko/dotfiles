@@ -85,6 +85,7 @@ alias zshconfig="mate ~/.zshrc"
 
 alias yy='yarn && yarn'
 alias ys='BROWSER=none yarn start'
+alias yss='BROWSER=none yarn start:storybook'
 alias yys='yarn && ys'
 alias yb='yarn build'
 alias yyb='yarn && yb'
@@ -101,6 +102,8 @@ alias ydm='yarn dedupe --mode=update-lockfile'
 alias yyd='yarn && yarn dedupe'
 alias yydm='yarn --mode=update-lockfile && yarn dedupe --mode=update-lockfile'
 alias ystrrfc='(){ yarn sled-test-runner remote -f $1 --flakiness-check=20 }'
+# ybwd = yarn build with deps
+alias ybwd='yarn workspaces foreach -pR --topological-dev run build'
 
 alias nlsit='npm link @wix/santa-integration-tests'
 
@@ -124,22 +127,23 @@ alias sep='cd ~/Projects/santa-editor-parent'
 alias sepu='cd ~/Projects/SantaEditorPresetsUploader'
 alias sit='cd ~/Projects/santa-integration-tests'
 
-alias bccv='cd ~/Projects/bookings-calendar-catalog-viewer'
-
-alias bcco='cd ~/Projects/bookings-calendar-catalog-owner'
-alias bam='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-availability-management'
-alias bsfp='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-service-form-page'
-alias bpp='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-pricing-plans'
-alias bnsbm='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-namespaces-bm'
-alias bsm='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-staff-management'
-alias bsl='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-services-list'
-alias bss='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-services-statics'
-alias bicp='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-integration-channels-page'
-alias bacs='cd ~/Projects/bookings-calendar-catalog-owner/packages/bookings-anywhere-channels-statics'
-alias bccboc='cd ~/Projects/bookings-calendar-catalog-owner/packages/modules/bookings-cc-bo-common'
-alias bppa='cd ~/Projects/bookings-calendar-catalog-owner/packages/modules/bookings-pricing-plans-api'
-alias bnsbma='cd ~/Projects/bookings-calendar-catalog-owner/packages/modules/bookings-namespaces-api'
-alias bsu='cd ~/Projects/bookings-calendar-catalog-owner/packages/modules/bookings-sled-utils'
+alias bcbo='cd ~/Projects/bookings-catalog-bo'
+alias bsfp='cd ~/Projects/bookings-catalog-bo/apps/bookings-service-form-page'
+alias bpp='cd ~/Projects/bookings-catalog-bo/apps/bookings-pricing-plans'
+alias bnsbm='cd ~/Projects/bookings-catalog-bo/apps/bookings-namespaces-bm'
+alias bsm='cd ~/Projects/bookings-catalog-bo/apps/bookings-staff-management'
+alias bsl='cd ~/Projects/bookings-catalog-bo/apps/bookings-services-list'
+alias bss='cd ~/Projects/bookings-catalog-bo/apps/bookings-services-statics'
+alias bsets='cd ~/Projects/bookings-catalog-bo/apps/bookings-settings-statics'
+alias bsp='cd ~/Projects/bookings-catalog-bo/apps/bookings-settings-page'
+alias bicp='cd ~/Projects/bookings-catalog-bo/apps/bookings-integration-channels-page'
+alias bacs='cd ~/Projects/bookings-catalog-bo/apps/bookings-anywhere-channels-statics'
+alias bpl='cd ~/Projects/bookings-catalog-bo/apps/bookings-policies-list'
+alias bpf='cd ~/Projects/bookings-catalog-bo/apps/bookings-policy-form'
+alias bccboc='cd ~/Projects/bookings-catalog-bo/packages/bookings-cc-bo-common'
+alias bppa='cd ~/Projects/bookings-catalog-bo/packages/bookings-pricing-plans-api'
+alias bnsbma='cd ~/Projects/bookings-catalog-bo/packages/bookings-namespaces-api'
+alias bsu='cd ~/Projects/bookings-catalog-bo/packages/bookings-sled-utils'
 
 alias sss='P && spot-spotter-server'
 
@@ -153,23 +157,34 @@ alias got=git
 alias gt=git
 alias gpr-no-rm='git pull --rebase'
 alias gpr='gpr-no-rm && rm-gone'
-alias gct='git commit -am"wip" --no-verify'
+alias gct='git commit -m"wip" --no-verify'
+alias gcta='git commit -am"wip" --no-verify'
 alias gcomp='(){ BRANCH="$(git rev-parse --abbrev-ref HEAD)"; URL="$(git config --get remote.origin.url)"; git push origin -u $BRANCH; open "$URL/pull/new/$BRANCH" }'
 
-alias rm-merged='git fetch -p && git branch --merged | grep -v "\*" | grep -v master | grep -v develop | grep -v release | xargs -n 1 git branch -d'
+alias rm-merged='git fetch -p && git branch --merged | grep -v "\*" | grep -v "\+" | grep -v master | grep -v develop | grep -v release | xargs -n 1 git branch -d'
 alias rm-squashed='git fetch -p && git branch -vv | cut -c 3- | grep '"'"': gone]'"'"' | awk '"'"'{print $1}'"'"' | xargs -n1 -r git branch -D'
 alias rm-gone='rm-merged && rm-squashed'
 alias sync='sync-no-rm && rm-gone'
 alias sync-no-rm='git fetch -p && git fetch origin master:master'
+alias sync-no-rm-o='git fetch -p'
 alias sync-rebase-no-rm='(){ sync-no-rm; [[ $1 ]] && git co $1; git rebase master --autosquash; }'
+alias sync-rebase-no-rm-o='(){ sync-no-rm-o; [[ $1 ]] && git co $1; git rebase origin/master --autosquash; }'
 alias sync-rebase='(){ sync-rebase-no-rm $1 && rm-gone }'
+alias sync-rebase-origin='(){ sync-rebase-no-rm-o $1 && rm-gone }'
 alias sync-rebase-interactive='(){ sync-no-rm; [[ $1 ]] && git co $1; git rebase master -i --autosquash && rm-gone; }'
+alias sync-rebase-interactive-origin='(){ sync-no-rm-o; [[ $1 ]] && git co $1; git rebase origin/master -i --autosquash && rm-gone; }'
 alias sync-merge='(){ sync-no-rm; [[ $1 ]] && git co $1; git merge master -m"merge master" && rm-gone; }'
+alias sync-merge-origin='(){ sync-no-rm-o; [[ $1 ]] && git co $1; git merge origin/master -m"merge master" && rm-gone; }'
 alias master='(){ [[ $(git rev-parse --abbrev-ref HEAD) == "master" ]] && (gpr-no-rm) || (sync-no-rm); [[ $1 ]] && (git co -b $1 master) || (git co master); rm-gone; }'
+alias master-origin='(){ sync-no-rm-o; git co -b $1 origin/master --no-track; rm-gone; }'
 alias m='master'
+alias mo='master-origin'
 alias sr='(){ sync-rebase $1 }'
+alias sro='(){ sync-rebase-origin $1 }'
 alias sri='(){ sync-rebase-interactive $1 }'
+alias srio='(){ sync-rebase-interactive-origin $1 }'
 alias sm='(){ sync-merge $1 }'
+alias smo='(){ sync-merge-origin $1 }'
 alias smgp='(){ sm $1 && gp }'
 alias srgpf='(){ sr $1 && gpf }'
 alias srgcomp='sr && gcomp'
@@ -187,38 +202,7 @@ alias c='cd .'
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-
-
-
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-
 alias vlc='/Applications/VLC.app/Contents/MacOS/VLC'
-
-# place this after nvm initialization!
-autoload -U add-zsh-hook
-load-nvmrc() {
-  local node_version="$(nvm version)"
-  local nvmrc_path="$(nvm_find_nvmrc)"
-
-  if [ -n "$nvmrc_path" ]; then
-    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
-
-    if [ "$nvmrc_node_version" = "N/A" ]; then
-      nvm install
-    elif [ "$nvmrc_node_version" != "$node_version" ]; then
-      nvm use
-    fi
-  elif [ "$node_version" != "$(nvm version default)" ]; then
-    echo "Reverting to nvm default version"
-    nvm use default
-  fi
-}
-add-zsh-hook chpwd load-nvmrc
-load-nvmrc
 
 export PATH="/usr/local/bin:$PATH"
 
@@ -265,3 +249,10 @@ __yarn_wrapper () {
 
 alias npm=__npm_wrapper
 alias yarn=__yarn_wrapper
+
+BROWSER=none
+
+# fnm START
+export PATH="/Users/ilyap/Library/Application Support/fnm:$PATH"
+eval "`fnm env --use-on-cd --version-file-strategy recursive`"
+# fnm END
