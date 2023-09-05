@@ -88,44 +88,26 @@ alias ys='BROWSER=none yarn start'
 alias yss='BROWSER=none yarn start:storybook'
 alias yys='yarn && ys'
 alias yb='yarn build'
+alias ybp='yarn build:packages'
 alias yyb='yarn && yb'
 alias ybl='yarn && yarn build:local'
 alias yc='yarn changelog'
 alias yt='yarn && yarn test'
 alias ybt='yarn && yb && yt'
 alias yl='yarn && yarn lint'
-alias ylf='yarn && yarn lint:fix'
+alias ylf='yarn lint:fix'
+alias yylf='yarn && ylf'
 alias ydd='npx yarn-deduplicate yarn.lock && yarn'
 alias ym='yarn --mode=update-lockfile'
 alias yd='yarn dedupe'
 alias ydm='yarn dedupe --mode=update-lockfile'
 alias yyd='yarn && yarn dedupe'
 alias yydm='yarn --mode=update-lockfile && yarn dedupe --mode=update-lockfile'
+alias yui='yarn upgrade-interactive'
 alias ystrrfc='(){ yarn sled-test-runner remote -f $1 --flakiness-check=20 }'
-# ybwd = yarn build with deps
-alias ybwd='yarn workspaces foreach -pR --topological-dev run build'
 
-alias nlsit='npm link @wix/santa-integration-tests'
-
-alias g6='cd ~/Projects/media-manager-g6'
-alias g5='cd ~/Projects/media-gallery-g5'
-alias mmgrsdk='cd ~/Projects/media/media-manager-sdk'
-alias media='cd ~/Projects/media'
 alias Projects='cd ~/Projects'
 alias P='Projects'
-
-alias wsr='cd ~/Projects/wix-style-react'
-
-alias ap='cd ~/Projects/add-panel'
-alias aps='cd ~/Projects/add-panel/add-panel-service'
-alias apc='cd ~/Projects/add-panel/add-panel-component'
-alias apco='cd ~/Projects/add-panel/add-panel-common'
-alias apdce='cd ~/Projects/add-panel/add-panel-data-classic-editor'
-
-alias se='cd ~/Projects/santa-editor-parent/santa-editor'
-alias sep='cd ~/Projects/santa-editor-parent'
-alias sepu='cd ~/Projects/SantaEditorPresetsUploader'
-alias sit='cd ~/Projects/santa-integration-tests'
 
 alias bcbo='cd ~/Projects/bookings-catalog-bo'
 alias bsfp='cd ~/Projects/bookings-catalog-bo/apps/bookings-service-form-page'
@@ -146,8 +128,6 @@ alias bnsbma='cd ~/Projects/bookings-catalog-bo/packages/bookings-namespaces-api
 alias bsu='cd ~/Projects/bookings-catalog-bo/packages/bookings-sled-utils'
 
 alias sss='P && spot-spotter-server'
-
-alias dm='cd ~/Projects/document-management'
 
 alias git=hub
 alias gut=git
@@ -256,3 +236,12 @@ BROWSER=none
 export PATH="/Users/ilyap/Library/Application Support/fnm:$PATH"
 eval "`fnm env --use-on-cd --version-file-strategy recursive`"
 # fnm END
+
+
+# For React Native
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home"
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+
+export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/3.2.0/bin:$PATH"
