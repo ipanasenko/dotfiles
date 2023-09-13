@@ -105,6 +105,8 @@ alias yyd='yarn && yarn dedupe'
 alias yydm='yarn --mode=update-lockfile && yarn dedupe --mode=update-lockfile'
 alias yui='yarn upgrade-interactive'
 alias ystrrfc='(){ yarn sled-test-runner remote -f $1 --flakiness-check=20 }'
+# ybwd = yarn build with deps
+alias ybwd='yarn workspaces foreach -pR --topological-dev run build'
 
 alias Projects='cd ~/Projects'
 alias P='Projects'
