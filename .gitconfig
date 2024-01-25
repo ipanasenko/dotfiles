@@ -14,6 +14,7 @@
 	oldest-ancestor = !zsh -c 'diff --old-line-format= --new-line-format= <(git rev-list --first-parent \"${1:-master}\") <(git rev-list --first-parent \"${2:-HEAD}\") | head -1' -
 	pr = !"gcomp"
 	co = checkout
+	cane = commit --amend --no-edit
 	st = status --short --branch
 	sy = st
 	pyll = pull

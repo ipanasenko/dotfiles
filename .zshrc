@@ -89,20 +89,24 @@ alias yss='BROWSER=none yarn start:storybook'
 alias yys='yarn && ys'
 alias yb='yarn build'
 alias ybp='yarn build:packages'
+alias yybp='yarn && ybp'
 alias yyb='yarn && yb'
 alias ybl='yarn && yarn build:local'
 alias yc='yarn changelog'
-alias yt='yarn && yarn test'
+alias yt='yarn test'
+alias yyt='yarn && yt'
 alias ybt='yarn && yb && yt'
-alias yl='yarn && yarn lint'
+alias yl='yarn lint'
+alias yyl='yarn && yl'
 alias ylf='yarn lint:fix'
 alias yylf='yarn && ylf'
 alias ydd='npx yarn-deduplicate yarn.lock && yarn'
 alias ym='yarn --mode=update-lockfile'
-alias yd='yarn dedupe'
-alias ydm='yarn dedupe --mode=update-lockfile'
-alias yyd='yarn && yarn dedupe'
-alias yydm='yarn --mode=update-lockfile && yarn dedupe --mode=update-lockfile'
+alias yd='yarn dedupe --strategy highest'
+alias ydm='yarn dedupe --strategy highest --mode=update-lockfile'
+alias yyd='yarn --mode=update-lockfile && yarn dedupe --strategy highest'
+alias yydm='yarn --mode=update-lockfile && yarn dedupe --strategy highest --mode=update-lockfile'
+alias yydmy='yydm && yarn'
 alias yui='yarn upgrade-interactive'
 alias ystrrfc='(){ yarn sled-test-runner remote -f $1 --flakiness-check=20 }'
 # ybwd = yarn build with deps
@@ -117,12 +121,16 @@ alias bpp='cd ~/Projects/bookings-catalog-bo/apps/bookings-pricing-plans'
 alias bnsbm='cd ~/Projects/bookings-catalog-bo/apps/bookings-namespaces-bm'
 alias bsm='cd ~/Projects/bookings-catalog-bo/apps/bookings-staff-management'
 alias bsl='cd ~/Projects/bookings-catalog-bo/apps/bookings-services-list'
+alias bgm='cd ~/Projects/bookings-catalog-bo/apps/bookings-gallery-manager'
 alias bss='cd ~/Projects/bookings-catalog-bo/apps/bookings-services-statics'
 alias bsets='cd ~/Projects/bookings-catalog-bo/apps/bookings-settings-statics'
 alias bsp='cd ~/Projects/bookings-catalog-bo/apps/bookings-settings-page'
 alias bicp='cd ~/Projects/bookings-catalog-bo/apps/bookings-integration-channels-page'
 alias bacs='cd ~/Projects/bookings-catalog-bo/apps/bookings-anywhere-channels-statics'
 alias bpl='cd ~/Projects/bookings-catalog-bo/apps/bookings-policies-list'
+alias bpagelinks='cd ~/Projects/bookings-catalog-bo/apps/bookings-page-links'
+alias blinksproto='cd ~/Projects/bookings-catalog-bo/proto-packages/bookings-links-service-api-proto'
+alias blinksservice='cd ~/Projects/bookings-catalog-bo/serverless/bookings-links-service'
 alias bpf='cd ~/Projects/bookings-catalog-bo/apps/bookings-policy-form'
 alias bccboc='cd ~/Projects/bookings-catalog-bo/packages/bookings-cc-bo-common'
 alias bppa='cd ~/Projects/bookings-catalog-bo/packages/bookings-pricing-plans-api'
@@ -137,6 +145,7 @@ alias giy=git
 alias gti=git
 alias got=git
 alias gt=git
+alias grH='git reset HEAD~'
 alias gpr-no-rm='git pull --rebase'
 alias gpr='gpr-no-rm && rm-gone'
 alias gct='git commit -m"wip" --no-verify'
@@ -157,8 +166,8 @@ alias sync-rebase-interactive='(){ sync-no-rm; [[ $1 ]] && git co $1; git rebase
 alias sync-rebase-interactive-origin='(){ sync-no-rm-o; [[ $1 ]] && git co $1; git rebase origin/master -i --autosquash && rm-gone; }'
 alias sync-merge='(){ sync-no-rm; [[ $1 ]] && git co $1; git merge master -m"merge master" && rm-gone; }'
 alias sync-merge-origin='(){ sync-no-rm-o; [[ $1 ]] && git co $1; git merge origin/master -m"merge master" && rm-gone; }'
-alias master='(){ [[ $(git rev-parse --abbrev-ref HEAD) == "master" ]] && (gpr-no-rm) || (sync-no-rm); [[ $1 ]] && (git co -b $1 master) || (git co master); rm-gone; }'
-alias master-origin='(){ sync-no-rm-o; git co -b $1 origin/master --no-track; rm-gone; }'
+alias master='(){ [[ $(git rev-parse --abbrev-ref HEAD) == "master" ]] && (gpr-no-rm) || (sync-no-rm); [[ $1 ]] && (git branch $1 master && git co -m $1) || (git co -m master); rm-gone; }'
+alias master-origin='(){ sync-no-rm-o; git branch $1 origin/master --no-track; git co -m $1; rm-gone; }'
 alias m='master'
 alias mo='master-origin'
 alias sr='(){ sync-rebase $1 }'
@@ -169,9 +178,11 @@ alias sm='(){ sync-merge $1 }'
 alias smo='(){ sync-merge-origin $1 }'
 alias smgp='(){ sm $1 && gp }'
 alias srgpf='(){ sr $1 && gpf }'
+alias srigpf='(){ sri $1 && gpf }'
 alias srgcomp='sr && gcomp'
 
 alias weap='(){ [[ $1 ]] && (webstorm-eap $1) || (webstorm-eap .) }'
+alias wnext='(){ [[ $1 ]] && (webstorm-next $1) || (webstorm-next .) }'
 alias ws='(){ [[ $1 ]] && (webstorm $1) || (webstorm .) }'
 alias f='fork .'
 alias tower='gittower .'
@@ -232,7 +243,8 @@ __yarn_wrapper () {
 alias npm=__npm_wrapper
 alias yarn=__yarn_wrapper
 
-BROWSER=none
+export BROWSER=none
+export QUICK_LINT=true
 
 # fnm START
 export PATH="/Users/ilyap/Library/Application Support/fnm:$PATH"
