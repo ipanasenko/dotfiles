@@ -53,7 +53,7 @@ plugins=(npm git)
 
 # User configuration
 
-export PATH="/Users/ilyap/.rbenv/shims:/usr/bin:/Users/ilyap/.node/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="/Users/ilyap/.rbenv/shims:/usr/bin:/opt/homebrew/bin:/Users/ilyap/.node/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
@@ -199,8 +199,6 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 alias vlc='/Applications/VLC.app/Contents/MacOS/VLC'
 
 export PATH="/usr/local/bin:$PATH"
-
-source /Users/ilyap/.config/broot/launcher/bash/br
 
 export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 export PUPPETEER_EXECUTABLE_PATH=`which chromium`
