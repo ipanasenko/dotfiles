@@ -176,6 +176,7 @@ alias sri='(){ sync-rebase-interactive $1 }'
 alias srio='(){ sync-rebase-interactive-origin $1 }'
 alias sm='(){ sync-merge $1 }'
 alias smo='(){ sync-merge-origin $1 }'
+alias smc='git commit -n --no-edit' # smc = sync merge continue
 alias smgp='(){ sm $1 && gp }'
 alias srgpf='(){ sr $1 && gpf }'
 alias srigpf='(){ sri $1 && gpf }'
