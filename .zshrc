@@ -297,8 +297,8 @@ alias new-worktree='(){
   repo_root=$(git rev-parse --show-toplevel) || return 1
   repo_name=$(basename "$repo_root")
   parent_dir=$(dirname "$repo_root")
-  rand=$(cat /dev/urandom | LC_CTYPE=C tr -dc "a-zA-Z0-9" | head -c 3)
-  worktree_dir="${parent_dir}/${repo_name}-${rand}"
+  branchName="$1"
+
   # Try to detect the default branch (main or master)
   default_branch=$(git remote show origin 2>/dev/null | awk "/HEAD branch/ {print \$NF}")
   if [[ -z "$default_branch" ]]; then
@@ -314,7 +314,26 @@ alias new-worktree='(){
   else
     git fetch origin "$default_branch"
   fi
-  git worktree add "$worktree_dir" "origin/$default_branch"
+
+  if [[ -n "$branchName" ]]; then
+    worktree_dir="${parent_dir}/${repo_name}-${branchName}"
+    # Check if branch exists on origin
+    if git ls-remote --exit-code --heads origin "$branchName" &>/dev/null; then
+      git fetch origin "$branchName"
+      branch_ref="origin/$branchName"
+    else
+      # Create local branch (not tracking) from default branch
+      git fetch origin "$default_branch"
+      git branch --no-track "$branchName" "origin/$default_branch"
+      branch_ref="$branchName"
+    fi
+  else
+    rand=$(cat /dev/urandom | LC_CTYPE=C tr -dc "a-zA-Z0-9" | head -c 3)
+    worktree_dir="${parent_dir}/${repo_name}-${rand}"
+    branch_ref="origin/$default_branch"
+  fi
+
+  git worktree add "$worktree_dir" "$branch_ref"
   cd "$worktree_dir"
 }'
 alias nwt='new-worktree'
