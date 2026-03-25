@@ -87,11 +87,16 @@ alias yy='yarn && yarn'
 alias ys='BROWSER=none yarn start'
 alias ysa='BROWSER=none yarn start:app'
 alias yssb='BROWSER=none yarn start:sb'
+alias tsa='BROWSER=none npx turbo start:app'
+alias tssb='BROWSER=none npx turbo start:sb'
 alias yys='yarn && ys'
 alias yb='yarn build'
+alias tb='t build'
 alias yyfbmb='yarn yoshi-flow-bm build'
 alias ybp='yarn build:packages'
 alias yybp='yarn && ybp'
+alias ybpd='yarn build:project-deps'
+alias yybpd='yarn && ybpd'
 alias yyb='yarn && yb'
 alias ybl='yarn && yarn build:local'
 alias yc='yarn changelog'
@@ -117,6 +122,9 @@ alias ystrrfc='(){ yarn sled-test-runner remote -f $1 --flakiness-check=20 }'
 # ybwd = yarn build with deps
 alias ybwd='(yarn build:deps:ws || ybp || yarn workspaces foreach -pR --topological-dev run build)'
 alias yybwd='yarn && ybwd'
+
+alias tbfr='t build:from-root'
+alias tbfrd='t generate-translation-keys && t build:from-root --filter=^...' # tbfrd = turbo build from root dependencies
 
 alias Projects='cd ~/Projects'
 alias P='Projects'
@@ -166,8 +174,28 @@ alias gpry='gpr && yarn'
 alias gpryybp='gpr && yybp'
 alias gct='git commit -m"wip" --no-verify'
 alias gcta='git commit -am"wip" --no-verify'
-alias gcan='(){ git commit -am"$1" --no-verify }' # gcan = git commit all and no verify
-alias gcangp='(){ gcan $1 && gp }'
+
+# Ensure our commit helpers are functions, not plugin aliases.
+unalias gca gcan gcangp 2>/dev/null
+
+gca() { # gca = git commit all
+  if [[ $# -eq 0 ]]; then
+    echo "Usage: gca <commit message>"
+    return 1
+  fi
+  git commit -a -m "$*"
+}
+
+gcan() { # gcan = git commit all and no verify
+  if [[ $# -eq 0 ]]; then
+    echo "Usage: gcan <commit message>"
+    return 1
+  fi
+  git commit -a -m "$*" --no-verify
+}
+
+gcangp() { gcan "$*" && gp; }
+
 alias gcan-bump='gcan "[all] PAY-46207 chore: bump deps
 - [x] <!-- dont-merge-base-branch --> 🔀 Do not merge master into this PR (Faster build, [Docs](https://dev.wix.com/docs/rnd-general/devex/falcon/features/avoid-merging-a-pr-with-base-branch))"'
 alias gcan-deps='gcan-bump'
@@ -260,8 +288,31 @@ if [[ " ${chpwd_functions[*]} " != *" __git_refresh_default_branch_cache "* ]]; 
 fi
 __git_refresh_default_branch_cache
 
-alias rm-merged='git fetch -p && git branch --merged | grep -v "\*" | grep -v "\+" | grep -v "^main$" | grep -v "^master$" | grep -v "^develop$" | grep -v "^release$" | xargs -n 1 git branch -d || true'
-alias rm-squashed='git fetch -p && git branch -vv | cut -c 3- | grep '"'"': gone]'"'"' | awk '"'"'{print $1}'"'"' | xargs -n1 -r git branch -D || true'
+alias rm-merged='() {
+  local default_branch="$(__git_default_branch)"
+  git fetch -p &&
+  git branch --format="%(refname:short)" --merged |
+  grep -v "^(HEAD" |
+  grep -v "\*" |
+  grep -v "\+" |
+  grep -v "^main$" |
+  grep -v "^master$" |
+  grep -v "^develop$" |
+  grep -v "^release$" |
+  grep -v "^${default_branch}\$" |
+  xargs -n 1 git branch -d || true
+}'
+
+alias rm-squashed='() {
+  local default_branch="$(__git_default_branch)"
+  git fetch -p &&
+  git branch -vv |
+  cut -c 3- |
+  grep ": gone]" |
+  awk "{print \$1}" |
+  grep -v "^${default_branch}\$" |
+  xargs -n1 -r git branch -D || true
+}'
 alias rm-gone='rm-merged && rm-squashed'
 alias sync='sync-no-rm && rm-gone'
 alias synco='sync-no-rm-o && rm-gone'
@@ -275,8 +326,33 @@ alias sync-rebase-interactive='(){ local base="$(__git_default_branch)"; sync-no
 alias sync-rebase-interactive-origin='(){ local origin_base="$(__git_origin_default_ref)"; sync-no-rm-o; [[ $1 ]] && git co $1; git rebase "$origin_base" -i --autosquash && rm-gone; }'
 alias sync-merge='(){ local base="$(__git_default_branch)"; sync-no-rm; [[ $1 ]] && git co $1; git merge "$base" -m"merge $base" && rm-gone; }'
 alias sync-merge-origin='(){ local origin_base="$(__git_origin_default_ref)"; sync-no-rm-o; [[ $1 ]] && git co $1; git merge "$origin_base" -m"merge $origin_base" && rm-gone; }'
-alias main='(){ local base="$(__git_default_branch)"; [[ $(git rev-parse --abbrev-ref HEAD) == "$base" ]] && (gpr-no-rm) || (sync-no-rm); [[ $1 ]] && (git branch $1 "$base" && git co -m $1) || (git co -m "$base"); rm-gone; }'
-alias main-origin='(){ local origin_base="$(__git_origin_default_ref)"; sync-no-rm-o; [[ $1 ]] && (git branch $1 "$origin_base" && git co -m $1) || (git co -m "$origin_base"); rm-gone; }'
+
+alias main='() {
+  local base="$(__git_default_branch)"
+  if [[ $(git rev-parse --abbrev-ref HEAD) == "$base" ]]; then
+    gpr-no-rm
+  else
+    sync-no-rm
+  fi
+  if [[ $1 ]]; then
+    git branch --no-track "$1" "$base" && git co -m "$1"
+  else
+    git co -m "$base"
+  fi
+  rm-gone
+}'
+
+alias main-origin='() {
+  local origin_base="$(__git_origin_default_ref)"
+  sync-no-rm-o
+  if [[ $1 ]]; then
+    git branch --no-track "$1" "$origin_base" && git co -m "$1"
+  else
+    git co -m "$origin_base"
+  fi
+  rm-gone
+}'
+
 alias m='main'
 alias mo='main-origin'
 alias sr='(){ sync-rebase $1 }'
@@ -294,10 +370,22 @@ alias srgcomp='sr && gcomp'
 
 
 alias new-worktree='(){
-  repo_root=$(git rev-parse --show-toplevel) || return 1
-  repo_name=$(basename "$repo_root")
-  parent_dir=$(dirname "$repo_root")
+  common_git_dir=$(git rev-parse --git-common-dir) || return 1
+  if [[ "$common_git_dir" != /* ]]; then
+    common_git_dir="$(cd "$common_git_dir" && pwd)"
+  fi
+
+  if [[ "$common_git_dir" == */.git ]]; then
+    repo_name=$(basename "${common_git_dir%/.git}")
+  else
+    repo_root=$(git rev-parse --show-toplevel) || return 1
+    repo_name=$(basename "$repo_root")
+  fi
   branchName="$1"
+  base_dir="$HOME/Projects/WORKTREES/$repo_name"
+
+  # Ensure base_dir exists
+  mkdir -p "$base_dir"
 
   # Try to detect the default branch (main or master)
   default_branch=$(git remote show origin 2>/dev/null | awk "/HEAD branch/ {print \$NF}")
@@ -316,7 +404,7 @@ alias new-worktree='(){
   fi
 
   if [[ -n "$branchName" ]]; then
-    worktree_dir="${parent_dir}/${repo_name}-${branchName}"
+    worktree_dir="${base_dir}/${branchName}"
     # Check if branch exists on origin
     if git ls-remote --exit-code --heads origin "$branchName" &>/dev/null; then
       git fetch origin "$branchName"
@@ -328,8 +416,8 @@ alias new-worktree='(){
       branch_ref="$branchName"
     fi
   else
-    rand=$(cat /dev/urandom | LC_CTYPE=C tr -dc "a-zA-Z0-9" | head -c 3)
-    worktree_dir="${parent_dir}/${repo_name}-${rand}"
+    rand=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 3)
+    worktree_dir="${base_dir}/${rand}"
     branch_ref="origin/$default_branch"
   fi
 
@@ -338,28 +426,94 @@ alias new-worktree='(){
 }'
 alias nwt='new-worktree'
 
-remove-current-worktree() {
-  force_flag=""
-  if [[ "$1" == "--force" ]]; then
-    force_flag="--force"
-  fi
-  current_dir=$(pwd)
-  repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "Not in a git repo"; return 1; }
-  # The first worktree entry from `git worktree list --porcelain` is the main worktree
-  main_worktree_path=$(git worktree list --porcelain | awk '/^worktree / {print $2; exit}')
-  if [[ "$current_dir" == "$main_worktree_path" ]]; then
-    echo "Refusing to remove main worktree ($current_dir)"
+move-worktree() {
+  local new_name="$1"
+  if [[ -z "$new_name" ]]; then
+    echo "Usage: move-worktree <new-name>"
     return 1
   fi
-  git worktree remove $force_flag "$current_dir"
+
+  if [[ "$new_name" == */* ]]; then
+    echo "Please provide only a directory name (no '/')."
+    return 1
+  fi
+
+  local current_root parent_dir target_path
+  current_root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+    echo "Not in a git worktree"
+    return 1
+  }
+
+  parent_dir=$(dirname "$current_root")
+  target_path="${parent_dir}/${new_name}"
+
+  if [[ "$target_path" == "$current_root" ]]; then
+    echo "Current worktree is already named '$new_name'"
+    return 0
+  fi
+
+  if [[ -e "$target_path" ]]; then
+    echo "Target path already exists: $target_path"
+    return 1
+  fi
+
+  git worktree move "$current_root" "$target_path" || return 1
+  cd "$target_path" || return 1
+}
+alias mvwt='move-worktree'
+
+remove-current-worktree() {
+  local force_flag=""
+  local wt_path=""
+  local arg=""
+
+  for arg in "$@"; do
+    case "$arg" in
+      -f|--force)
+        force_flag="--force"
+        ;;
+      -*)
+        echo "Unknown option: $arg"
+        echo "Usage: remove-current-worktree [path] [-f|--force]"
+        return 1
+        ;;
+      *)
+        if [[ -n "$wt_path" ]]; then
+          echo "Too many positional arguments."
+          echo "Usage: remove-current-worktree [path] [-f|--force]"
+          return 1
+        fi
+        wt_path="$arg"
+        ;;
+    esac
+  done
+
+  if [[ -z "$wt_path" ]]; then
+    local repo_root
+    repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "Not in a git repo"; return 1; }
+    local target_path="$repo_root"
+  else
+    local target_path="$wt_path"
+  fi
+
+  # The first worktree entry from `git worktree list --porcelain` is the main worktree
+  local main_worktree_path
+  main_worktree_path=$(git worktree list --porcelain | awk '/^worktree / {print $2; exit}')
+  if [[ "$target_path" == "$main_worktree_path" ]]; then
+    echo "Refusing to remove main worktree ($main_worktree_path)"
+    return 1
+  fi
+
+  git worktree remove $force_flag "$target_path"
 }
 alias rmwt='remove-current-worktree'
 
 
 alias rebase-last-commit-of-sheshesh-pr='(){ local origin_base="$(__git_origin_default_ref)"; git fetch && git checkout $1 && git rebase --onto "$origin_base" HEAD^ && git push --force-with-lease --no-verify }'
 
-alias c='(){ [[ $1 ]] && (cursor $1) || (cursor .) }'
-af() { agent -f "$@"; }
+alias c='(){ [[ $1 ]] && (cursor $1) || (cursor $(git rev-parse --show-toplevel 2>/dev/null || echo .)) }'
+function af() { agent -f "$*"; }
+function cf() { codex --yolo "$*"; }
 alias ws='(){ [[ $1 ]] && (windsurf $1) || (windsurf .) }'
 alias weap='(){ [[ $1 ]] && (webstorm-eap $1) || (webstorm-eap .) }'
 alias wnext='(){ [[ $1 ]] && (webstorm-next $1) || (webstorm-next .) }'
@@ -467,3 +621,12 @@ export PATH=/Users/ilyap/.opencode/bin:$PATH
 
 # sled-playwright
 export SILENT_REPORT=true
+
+
+if [[ -n “$CURSOR_AGENT” ]]; then
+unset CI
+fi
+
+
+# dev3.0 CLI
+export PATH="$HOME/.dev3.0/bin:$PATH"
