@@ -1,0 +1,182 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+log() {
+  printf '[setup-worktree] %s\n' "$*"
+}
+
+usage() {
+  cat <<'EOF'
+Usage: setup-worktree [--from <path>] [--to <path>] [--help]
+
+Clones node_modules directories from a source repo/worktree into a destination
+repo/worktree using macOS clonefile for storage-efficient copies.
+
+Defaults:
+  --from  The main wosrktree for the current git repo
+  --to    The current working directory
+EOF
+}
+
+resolve_dir() {
+  local input_dir="$1"
+
+  if [[ ! -d "$input_dir" ]]; then
+    return 1
+  fi
+
+  (
+    cd "$input_dir" >/dev/null 2>&1
+    pwd -P
+  )
+}
+
+detect_source_root() {
+  local worktree_output
+
+  worktree_output="$(git worktree list --porcelain 2>/dev/null || true)"
+  awk 'BEGIN { prefix = "worktree " } index($0, prefix) == 1 { print substr($0, length(prefix) + 1); exit }' <<<"$worktree_output"
+}
+
+clonefile_dir() {
+  local source_path="$1"
+  local dest_path="$2"
+
+  python3 - "$source_path" "$dest_path" <<'PY'
+import ctypes
+import ctypes.util
+import os
+import sys
+
+source, destination = sys.argv[1], sys.argv[2]
+libc_path = ctypes.util.find_library("c")
+if not libc_path:
+    print("libc lookup failed", file=sys.stderr)
+    raise SystemExit(1)
+
+libc = ctypes.CDLL(libc_path, use_errno=True)
+libc.clonefile.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_uint32]
+libc.clonefile.restype = ctypes.c_int
+
+ret = libc.clonefile(source.encode(), destination.encode(), 0)
+if ret == 0:
+    raise SystemExit(0)
+
+errno_value = ctypes.get_errno()
+print(
+    f"clonefile failed for '{source}' -> '{destination}' "
+    f"(errno={errno_value}: {os.strerror(errno_value)})",
+    file=sys.stderr,
+)
+raise SystemExit(1)
+PY
+}
+
+SOURCE_ROOT=""
+DEST_ROOT="$(pwd -P)"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --from)
+      if [[ $# -lt 2 ]]; then
+        log "Missing value for --from."
+        usage
+        exit 1
+      fi
+      SOURCE_ROOT="$2"
+      shift 2
+      ;;
+    --to)
+      if [[ $# -lt 2 ]]; then
+        log "Missing value for --to."
+        usage
+        exit 1
+      fi
+      DEST_ROOT="$2"
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      log "Unknown argument: $1"
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+if ! command -v python3 >/dev/null 2>&1; then
+  log "WARNING: storage-saving copy failed for all paths because python3 is unavailable."
+  exit 0
+fi
+
+if [[ -z "$SOURCE_ROOT" ]]; then
+  SOURCE_ROOT="$(detect_source_root)"
+fi
+
+if [[ -z "$SOURCE_ROOT" ]]; then
+  log "Could not detect source worktree from 'git worktree list'. Use --from <path> to set it explicitly."
+  exit 0
+fi
+
+if ! SOURCE_ROOT="$(resolve_dir "$SOURCE_ROOT")"; then
+  log "Source root '$SOURCE_ROOT' does not exist; skipping node_modules clone."
+  exit 0
+fi
+
+if ! DEST_ROOT="$(resolve_dir "$DEST_ROOT")"; then
+  log "Destination root '$DEST_ROOT' does not exist; skipping node_modules clone."
+  exit 0
+fi
+
+if [[ "$SOURCE_ROOT" == "$DEST_ROOT" ]]; then
+  log "Source and destination are the same directory; skipping node_modules clone."
+  exit 0
+fi
+
+cloned_count=0
+failed_count=0
+skipped_count=0
+found_count=0
+
+while IFS= read -r source_path; do
+  found_count=$((found_count + 1))
+
+  relative_path="${source_path#$SOURCE_ROOT/}"
+  if [[ "$relative_path" == "$source_path" ]]; then
+    log "Skipping unexpected path outside source root: $source_path"
+    skipped_count=$((skipped_count + 1))
+    continue
+  fi
+
+  dest_path="$DEST_ROOT/$relative_path"
+
+  if [[ -e "$dest_path" ]]; then
+    skipped_count=$((skipped_count + 1))
+    log "Skipping existing path: $relative_path"
+    continue
+  fi
+
+  mkdir -p "$(dirname "$dest_path")"
+
+  if clonefile_dir "$source_path" "$dest_path"; then
+    cloned_count=$((cloned_count + 1))
+    log "Storage-saving clone succeeded: $relative_path"
+  else
+    failed_count=$((failed_count + 1))
+    log "WARNING: storage-saving copy failed: $relative_path"
+  fi
+done < <(
+  find "$SOURCE_ROOT" \
+    \( -type d -name .git -prune \) -o \
+    \( -type d -name node_modules -print -prune \) \
+    | LC_ALL=C sort
+)
+
+if [[ "$found_count" -eq 0 ]]; then
+  log "No node_modules directories found under '$SOURCE_ROOT'."
+fi
+
+log "node_modules clone summary: found=$found_count cloned=$cloned_count skipped=$skipped_count failed=$failed_count"
