@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/ilyap/.oh-my-zsh
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -53,7 +53,7 @@ plugins=(git)
 
 # User configuration
 
-export PATH="/Users/ilyap/.rbenv/shims:/Users/ilyap/.node/bin:/opt/homebrew/bin:/usr/bin:/usr/local/bin:/bin:/usr/sbin:/sbin"
+export PATH="$HOME/.rbenv/shims:$HOME/.node/bin:/opt/homebrew/bin:/usr/bin:/usr/local/bin:/bin:/usr/sbin:/sbin"
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
@@ -83,15 +83,19 @@ source $ZSH/oh-my-zsh.sh
 alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+alias cl='clear'
+
 alias yy='yarn && yarn'
 alias ys='BROWSER=none yarn start'
 alias ysa='BROWSER=none yarn start:app'
+alias ysi='BROWSER=none yarn start:integrations'
 alias yssb='BROWSER=none yarn start:sb'
 alias tsa='BROWSER=none npx turbo start:app'
 alias tssb='BROWSER=none npx turbo start:sb'
 alias yys='yarn && ys'
 alias yb='yarn build'
 alias tb='t build'
+alias tbd='t build --filter=^...' # tbd = turbo build dependencies
 alias yyfbmb='yarn yoshi-flow-bm build'
 alias ybp='yarn build:packages'
 alias yybp='yarn && ybp'
@@ -116,7 +120,8 @@ alias yyd='yarn --mode=update-lockfile && yarn dedupe --strategy highest'
 alias yydm='yarn --mode=update-lockfile && yarn dedupe --strategy highest --mode=update-lockfile'
 alias yydmy='yydm && yarn'
 alias yydbp='yyd && ybp'
-alias yui='yarn upgrade-interactive && yd'
+alias yui='yarn upgrade-interactive'
+alias yuid='yui && yd'
 alias yuim='yarn upgrade-interactive --mode=update-lockfile'
 alias ystrrfc='(){ yarn sled-test-runner remote -f $1 --flakiness-check=20 }'
 # ybwd = yarn build with deps
@@ -124,7 +129,11 @@ alias ybwd='(yarn build:deps:ws || ybp || yarn workspaces foreach -pR --topologi
 alias yybwd='yarn && ybwd'
 
 alias tbfr='t build:from-root'
+alias tbfrsb='t build:from-root build:sb'
 alias tbfrd='t generate-translation-keys && t build:from-root --filter=^...' # tbfrd = turbo build from root dependencies
+
+alias ybfr='yarn build:from-root'
+alias ybfrd='yarn generate-translation-keys && yarn build:from-root --filter=^...' # ybfrd = yarn build from root dependencies
 
 alias Projects='cd ~/Projects'
 alias P='Projects'
@@ -362,6 +371,8 @@ alias sri='(){ sync-rebase-interactive $1 }'
 alias srio='(){ sync-rebase-interactive-origin $1 }'
 alias sm='(){ sync-merge $1 }'
 alias smo='(){ sync-merge-origin $1 }'
+alias smogp='(){ smo $1 && gp }'
+alias smogpf='(){ smo $1 && gpf }'
 alias smc='git commit -an --no-edit' # smc = sync merge continue
 alias smgp='(){ sm $1 && gp }'
 alias srgpf='(){ sr $1 && gpf }'
@@ -509,6 +520,13 @@ remove-current-worktree() {
 alias rmwt='remove-current-worktree'
 
 
+
+setup-worktree-node-modules() {
+  ~/Projects/dotfiles/bin/setup-worktree "$@"
+}
+alias swt='setup-worktree-node-modules'
+
+
 alias rebase-last-commit-of-sheshesh-pr='(){ local origin_base="$(__git_origin_default_ref)"; git fetch && git checkout $1 && git rebase --onto "$origin_base" HEAD^ && git push --force-with-lease --no-verify }'
 
 alias c='(){ [[ $1 ]] && (cursor $1) || (cursor $(git rev-parse --show-toplevel 2>/dev/null || echo .)) }'
@@ -521,7 +539,7 @@ alias f='open -a fork .'
 alias tower='gittower .'
 alias code='(){ [[ $1 ]] && (code $1) || (code .) }'
 alias codi='(){ [[ $1 ]] && (code-insiders $1) || (code-insiders .) }'
-alias wsurf='windsurf'
+
 
 alias npmv='(){ npm v $1 version }'
 
@@ -535,11 +553,48 @@ export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 export PUPPETEER_EXECUTABLE_PATH=`which chromium`
 
 # bun completions
-[ -s "/Users/ilyap/.bun/_bun" ] && source "/Users/ilyap/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+
+
+ kill-by-port() {
+  local force=0
+  local port=""
+  local arg
+  local pid
+
+  for arg in "$@"; do
+    if [[ "$arg" == "-f" ]]; then
+      force=1
+    else
+      port="$arg"
+    fi
+  done
+
+  if [[ -z "$port" ]]; then
+    echo "Usage: kill-by-port <port> [-f]"
+    return 1
+  fi
+
+  pid=$(lsof -tiTCP:"$port" -sTCP:LISTEN)
+
+  if [[ -z "$pid" ]]; then
+    echo "Nothing listening on port $port"
+    return 0
+  fi
+
+  if [[ "$force" -eq 1 ]]; then
+    echo "Force killing PID $pid on port $port"
+    kill -9 "$pid"
+  else
+    echo "Killing PID $pid on port $port"
+    kill "$pid"
+  fi
+}
 
 
 # tmutil_exclude() {
@@ -573,8 +628,8 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # alias npm=__npm_wrapper
 # alias yarn=__yarn_wrapper
 
-alias npmpublic="npm config set registry https://registry.npmjs.org/ && npm config get registry && yarn config set npmRegistryServer https://registry.npmjs.org/ --home || yarn config set registry https://registry.npmjs.org/"
-alias npmprivate="npm config set registry https://npm.dev.wixpress.com && npm config get registry && yarn config set npmRegistryServer https://npm.dev.wixpress.com --home || yarn config set registry https://npm.dev.wixpress.com"
+alias npmpublic="npm config set registry https://registry.npmjs.org/ && npm config get registry"
+alias npmprivate="npm config set registry https://npm.dev.wixpress.com && npm config get registry"
 
 
 
@@ -587,36 +642,35 @@ export EDITOR=cursor
 export QUICK_LINT=true
 
 # fnm START
-export PATH="/Users/ilyap/Library/Application Support/fnm:$PATH"
+export PATH="$HOME/Library/Application Support/fnm:$PATH"
 eval "`fnm env --use-on-cd --version-file-strategy recursive`"
 # fnm END
 
 
 # For React Native
 export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-18.0.2.1.jdk/Contents/Home"
-export ANDROID_HOME=$HOME/Library/Android/sdk
+export ANDROID_HOME="$HOME/Library/Android/sdk"
 export PATH=$PATH:$ANDROID_HOME/emulator
 export PATH=$PATH:$ANDROID_HOME/platform-tools
 
 export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/3.2.0/bin:$PATH"
-export PATH="/Users/ilyap/apache-maven-3.9.6/bin:$PATH"
+export PATH="$HOME/apache-maven-3.9.6/bin:$PATH"
 
 
 autoload -U compinit && compinit
 zmodload -i zsh/complist
 
-source /Users/ilyap/.config/broot/launcher/bash/br
 export PATH="/opt/homebrew/sbin:$PATH"
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 export PATH="/opt/homebrew/opt/gradle@7/bin:$PATH"
 
 export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH"
-export PATH="$PATH:/Users/ilyap/.local/bin"
+export PATH="$PATH:$HOME/.local/bin"
 
 export SKIP_BETTERER_ON_PRECOMMIT=true
 
 # opencode
-export PATH=/Users/ilyap/.opencode/bin:$PATH
+export PATH="$HOME/.opencode/bin:$PATH"
 
 
 # sled-playwright

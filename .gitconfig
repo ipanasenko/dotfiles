@@ -4,6 +4,8 @@
 [user]
 	name = Illia Panasenko
 	email = ilyap@wix.com
+[advice]
+	detachedHead = false
 [filter "hawser"]
 	clean = git hawser clean %f
 	smudge = git hawser smudge %f
@@ -14,6 +16,7 @@
 	oldest-ancestor = !zsh -c 'diff --old-line-format= --new-line-format= <(git rev-list --first-parent \"${1:-master}\") <(git rev-list --first-parent \"${2:-HEAD}\") | head -1' -
 	pr = !"gcomp"
 	co = checkout
+	cp = cherry-pick
 	cane = commit --amend --no-edit
 	st = status --short --branch
 	sy = st
@@ -41,8 +44,8 @@
 	newNormal = green bold
 	newHighlight = green bold 22
 [filter "lfs"]
-	clean = git lfs clean %f
-	smudge = git lfs smudge %f
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
 	required = true
 	process = git-lfs filter-process
 [commit]
@@ -53,10 +56,25 @@
 [rebase]
 	autoStash = true
 [pull]
-	rebase = true
+	# rebase = true
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path =
+	path = 
 [mergetool "sourcetree"]
 	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
+[http]
+	lowSpeedLimit = 1000
+	lowSpeedTime = 300
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+	username = ipanasenko
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential]
+	helper = 
+	helper = /usr/local/share/gcm-core/git-credential-manager
+[credential "https://dev.azure.com"]
+	useHttpPath = true
