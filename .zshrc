@@ -643,7 +643,10 @@ export QUICK_LINT=true
 
 # fnm START
 export PATH="$HOME/Library/Application Support/fnm:$PATH"
-eval "`fnm env --use-on-cd --version-file-strategy recursive`"
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --shell zsh --use-on-cd --version-file-strategy recursive)"
+  fnm use --install-if-missing >/dev/null 2>&1 || true
+fi
 # fnm END
 
 

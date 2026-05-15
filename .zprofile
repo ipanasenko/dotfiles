@@ -9,7 +9,7 @@ export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 export PATH="$PATH:$HOME/.local/bin"
 
 
-if command -v fnm >/dev/null 2>&1; then
+if [[ ! -o interactive ]] && command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env --shell zsh --version-file-strategy recursive)"
   fnm use --install-if-missing >/dev/null 2>&1 || true
 fi

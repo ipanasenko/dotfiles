@@ -1,6 +1,6 @@
 export PATH="$HOME/Library/Application Support/fnm:$PATH"
 
-if command -v fnm >/dev/null 2>&1; then
-  eval "$(fnm env --shell zsh --version-file-strategy recursive)"
-  fnm use --install-if-missing >/dev/null 2>&1 || true
+# Codex sandbox cannot write to ~/.local/state; keep fnm multishell state writable there.
+if [[ -n "$CODEX_SANDBOX" && -z "$XDG_STATE_HOME" ]]; then
+  export XDG_STATE_HOME="${TMPDIR%/}/codex-xdg-state"
 fi
