@@ -184,6 +184,8 @@ alias gpryybp='gpr && yybp'
 alias gct='git commit -m"wip" --no-verify'
 alias gcta='git commit -am"wip" --no-verify'
 
+alias update-pr="gh pr update-branch"
+
 # Ensure our commit helpers are functions, not plugin aliases.
 unalias gca gcan gcangp 2>/dev/null
 
@@ -209,7 +211,7 @@ alias gcan-bump='gcan "[all] PAY-46207 chore: bump deps
 - [x] <!-- dont-merge-base-branch --> 🔀 Do not merge master into this PR (Faster build, [Docs](https://dev.wix.com/docs/rnd-general/devex/falcon/features/avoid-merging-a-pr-with-base-branch))"'
 alias gcan-deps='gcan-bump'
 alias gcaane='git commit -a --amend --no-edit'
-alias gcomp='(){ BRANCH="$(git rev-parse --abbrev-ref HEAD)"; URL="$(git config --get remote.origin.url)"; git push origin -u $BRANCH; open "$URL/pull/new/$BRANCH" }'
+alias gcomp='(){ BRANCH="$(git rev-parse --abbrev-ref HEAD)"; URL="$(git config --get remote.origin.url)"; git push origin -u $BRANCH --no-verify; open "$URL/pull/new/$BRANCH" }'
 
 # Cache default branch per-repo, so git aliases don't re-detect every invocation.
 typeset -gA __git_default_branch_by_repo
@@ -532,6 +534,19 @@ alias rebase-last-commit-of-sheshesh-pr='(){ local origin_base="$(__git_origin_d
 alias c='(){ [[ $1 ]] && (cursor $1) || (cursor $(git rev-parse --show-toplevel 2>/dev/null || echo .)) }'
 function af() { agent -f "$*"; }
 function cf() { codex --yolo "$*"; }
+
+# claudex — Claude Code harness driving GPT-5.6 Sol via CLIProxyAPI
+claudex() {
+  ANTHROPIC_BASE_URL=http://127.0.0.1:8317 \
+  ANTHROPIC_AUTH_TOKEN='op://Private/CLIProxyAPI/password' \
+  ANTHROPIC_DEFAULT_HAIKU_MODEL=gpt-5.6-sol \
+  CLAUDE_CODE_SUBAGENT_MODEL=gpt-5.6-sol \
+  CLAUDE_CODE_ALWAYS_ENABLE_EFFORT=1 \
+  CLAUDE_CODE_MAX_TOOL_USE_CONCURRENCY=3 \
+  ENABLE_TOOL_SEARCH=false \
+  op run -- claude --model gpt-5.6-sol "$@"
+}
+
 alias ws='(){ [[ $1 ]] && (windsurf $1) || (windsurf .) }'
 alias weap='(){ [[ $1 ]] && (webstorm-eap $1) || (webstorm-eap .) }'
 alias wnext='(){ [[ $1 ]] && (webstorm-next $1) || (webstorm-next .) }'
@@ -687,3 +702,11 @@ fi
 
 # dev3.0 CLI
 export PATH="$HOME/.dev3.0/bin:$PATH"
+
+# Mole shell completion
+if output="$(mole completion zsh 2>/dev/null)"; then eval "$output"; fi
+
+# >>> railway initialize >>>
+source "$HOME/.railway/env"
+# <<< railway initialize <<<
+export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
