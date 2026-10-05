@@ -96,16 +96,12 @@ alias yys='yarn && ys'
 alias yb='yarn build'
 alias tb='t build'
 alias tbd='t build --filter=^...' # tbd = turbo build dependencies
-alias yyfbmb='yarn yoshi-flow-bm build'
-alias ybp='yarn build:packages'
 alias yybp='yarn && ybp'
-alias ybpd='yarn build:project-deps'
 alias yybpd='yarn && ybpd'
 alias yyb='yarn && yb'
 alias ybl='yarn && yarn build:local'
 alias yc='yarn changelog'
 alias yt='yarn test'
-alias ytuwf='(){ yarn test:unit --watch -f $1 }'
 alias yyt='yarn && yt'
 alias ybt='yarn && yb && yt'
 alias yl='yarn lint'
@@ -123,48 +119,10 @@ alias yydbp='yyd && ybp'
 alias yui='yarn upgrade-interactive'
 alias yuid='yui && yd'
 alias yuim='yarn upgrade-interactive --mode=update-lockfile'
-alias ystrrfc='(){ yarn sled-test-runner remote -f $1 --flakiness-check=20 }'
-# ybwd = yarn build with deps
-alias ybwd='(yarn build:deps:ws || ybp || yarn workspaces foreach -pR --topological-dev run build)'
-alias yybwd='yarn && ybwd'
-
-alias tbfr='t build:from-root'
-alias tbfrsb='t build:from-root build:sb'
-alias tbfrd='t generate-translation-keys && t build:from-root --filter=^...' # tbfrd = turbo build from root dependencies
-
-alias ybfr='yarn build:from-root'
-alias ybfrd='yarn generate-translation-keys && yarn build:from-root --filter=^...' # ybfrd = yarn build from root dependencies
 
 alias Projects='cd ~/Projects'
 alias P='Projects'
 
-alias bcbo='cd ~/Projects/bookings-catalog-bo'
-alias bsfp='cd ~/Projects/bookings-catalog-bo/apps/bookings-service-form-page'
-alias bbovcs='cd ~/Projects/bookings-catalog-bo/apps/bookings-bo-video-conferencing-statics'
-alias bpp='cd ~/Projects/bookings-catalog-bo/apps/bookings-pricing-plans'
-alias bgi='cd ~/Projects/bookings-catalog-bo/apps/bookings-google-integration'
-alias bsm='cd ~/Projects/bookings-catalog-bo/apps/bookings-staff-management'
-alias brm='cd ~/Projects/bookings-catalog-bo/apps/bookings-resource-management'
-alias bsl='cd ~/Projects/bookings-catalog-bo/apps/bookings-services-list'
-alias bgm='cd ~/Projects/bookings-catalog-bo/apps/bookings-gallery-manager'
-alias bss='cd ~/Projects/bookings-catalog-bo/apps/bookings-services-statics'
-alias bnoti='cd ~/Projects/bookings-catalog-bo/apps/bookings-notifications'
-alias bsets='cd ~/Projects/bookings-catalog-bo/apps/bookings-settings-statics'
-alias bsp='cd ~/Projects/bookings-catalog-bo/apps/bookings-settings-page'
-alias bicp='cd ~/Projects/bookings-catalog-bo/apps/bookings-integration-channels-page'
-alias bpl='cd ~/Projects/bookings-catalog-bo/apps/bookings-policies-list'
-alias bpagelinks='cd ~/Projects/bookings-catalog-bo/apps/bookings-page-links'
-alias blinksproto='cd ~/Projects/bookings-catalog-bo/proto-packages/bookings-links-service-api-proto'
-alias blinksservice='cd ~/Projects/bookings-catalog-bo/serverless/bookings-links-service'
-alias bpf='cd ~/Projects/bookings-catalog-bo/apps/bookings-policy-form'
-alias bccboc='cd ~/Projects/bookings-catalog-bo/packages/bookings-cc-bo-common'
-alias bppa='cd ~/Projects/bookings-catalog-bo/packages/bookings-pricing-plans-api'
-alias bsu='cd ~/Projects/bookings-catalog-bo/packages/bookings-sled-utils'
-
-alias wp='cd ~/Projects/wix-payments'
-alias wpcms='cd ~/Projects/wix-payments/packages/cashier-merchant-settings'
-
-alias sss='P && spot-spotter-server'
 
 alias git=hub
 alias gut=git
@@ -207,9 +165,6 @@ gcan() { # gcan = git commit all and no verify
 
 gcangp() { gcan "$*" && gp; }
 
-alias gcan-bump='gcan "[all] PAY-46207 chore: bump deps
-- [x] <!-- dont-merge-base-branch --> 🔀 Do not merge master into this PR (Faster build, [Docs](https://dev.wix.com/docs/rnd-general/devex/falcon/features/avoid-merging-a-pr-with-base-branch))"'
-alias gcan-deps='gcan-bump'
 alias gcaane='git commit -a --amend --no-edit'
 alias gcomp='(){ BRANCH="$(git rev-parse --abbrev-ref HEAD)"; URL="$(git config --get remote.origin.url)"; git push origin -u $BRANCH --no-verify; open "$URL/pull/new/$BRANCH" }'
 
@@ -529,11 +484,12 @@ setup-worktree-node-modules() {
 alias swt='setup-worktree-node-modules'
 
 
-alias rebase-last-commit-of-sheshesh-pr='(){ local origin_base="$(__git_origin_default_ref)"; git fetch && git checkout $1 && git rebase --onto "$origin_base" HEAD^ && git push --force-with-lease --no-verify }'
-
 alias c='(){ [[ $1 ]] && (cursor $1) || (cursor $(git rev-parse --show-toplevel 2>/dev/null || echo .)) }'
 function af() { agent -f "$*"; }
 function cf() { codex --yolo "$*"; }
+function codex-personal() { CODEX_HOME="$HOME/.codex-t3/personal" codex "$*"; }
+
+
 
 # claudex — Claude Code harness driving GPT-5.6 Sol via CLIProxyAPI
 claudex() {
@@ -612,41 +568,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 }
 
 
-# tmutil_exclude() {
-#     # todo: recurse to parent dirs to support commands that execute in project subdirs
-#     DIR=$1
-#     DEP_FILE=$2
-
-#     if [ -d "$DIR" ] && [ -f "$DEP_FILE" ] && ! tmutil isexcluded "$DIR" | grep -q '\[Excluded\]'; then
-#         tmutil addexclusion "$DIR"
-#         echo "tmutil: ${DIR} has been excluded from Time Machine backups"
-#     fi
-# }
-
-# __npm_wrapper () {
-#     command npm "$@"
-#     EXIT_CODE=$?
-#     tmutil_exclude "node_modules" "package.json"
-#     tmutil_exclude "dist" "package.json"
-#     tmutil_exclude "target" "package.json"
-#     return $EXIT_CODE
-# }
-# __yarn_wrapper () {
-#     command yarn "$@"
-#     EXIT_CODE=$?
-#     tmutil_exclude "node_modules" "package.json"
-#     tmutil_exclude "dist" "package.json"
-#     tmutil_exclude "target" "package.json"
-#     return $EXIT_CODE
-# }
-
-# alias npm=__npm_wrapper
-# alias yarn=__yarn_wrapper
-
-alias npmpublic="npm config set registry https://registry.npmjs.org/ && npm config get registry"
-alias npmprivate="npm config set registry https://npm.dev.wixpress.com && npm config get registry"
-
-
 
 
 alias turbo="npx turbo"
@@ -685,28 +606,48 @@ export PATH="/opt/homebrew/opt/gradle@7/bin:$PATH"
 export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH"
 export PATH="$PATH:$HOME/.local/bin"
 
-export SKIP_BETTERER_ON_PRECOMMIT=true
-
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
 
 
-# sled-playwright
-export SILENT_REPORT=true
-
-
-if [[ -n “$CURSOR_AGENT” ]]; then
-unset CI
-fi
-
-
-# dev3.0 CLI
-export PATH="$HOME/.dev3.0/bin:$PATH"
 
 # Mole shell completion
 if output="$(mole completion zsh 2>/dev/null)"; then eval "$output"; fi
 
+export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="/Users/ipanasenko/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end
+
+# Vite+ bin (https://viteplus.dev)
+. "/Users/ipanasenko/.config/vite-plus/env"
+
 # >>> railway initialize >>>
 source "$HOME/.railway/env"
 # <<< railway initialize <<<
-export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/ipanasenko/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/ipanasenko/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/ipanasenko/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/ipanasenko/google-cloud-sdk/completion.zsh.inc'; fi
+
+
+
+### STASH.GG STUFF START ###
+
+# usages: run (the shop app), run --app=studio (the studio app), run --app=admin (the admin app)
+alias run=$HOME/Projects/pie-mono/run.sh
+alias run-fe=$HOME/Projects/pie-mono/run.sh --no-local-be
+
+
+alias pm='cd ~/Projects/pie-mono'
+
+
+
+### STASH.GG STUFF END ###
